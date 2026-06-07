@@ -1,36 +1,31 @@
 # hanmatek-dos1104-py
 
-A small, easy-to-read **Python driver for the Hanmatek DOS1104** oscilloscope
+A Python driver for the Hanmatek DOS1104 oscilloscope
 (4-channel, 100 MHz). It talks to the scope over USB and lets you read
 measurements, compute statistics, and download waveforms from your PC.
 
-The DOS1104 uses the **Owon SDS1104** SCPI command set, so this driver will
-**probably also work with the Owon SDS1104 and its rebadges** - but it has only
-been **tested on a Hanmatek DOS1104 (firmware V1.2.0)**. If you try it on another
+The DOS1104 uses the Owon SDS1104 SCPI command set, so this driver will
+probably also work with the Owon SDS1104 and its rebadges - but it has only
+been tested on a Hanmatek DOS1104 (firmware V1.2.0). If you try it on another
 model, please open an issue and say whether it worked.
-
-Everything is in a single file, [`dos1104.py`](dos1104.py), with plain-language
-comments. You do not need to be a Python expert to use it.
 
 ---
 
-## The #1 thing: getting the scope to show up
+## Getting the scope to show up on the PC
 
-Most people get stuck here, and it is not documented anywhere. Do this **on the
-scope**, in order:
+Do this on the scope, in order (this step is often missed):
 
-1. **Set the USB mode to USBTMC:** `Utility` > `Function` > `Configure` >
-   `Device` > choose **`USBTMC`**.
-2. **Use the correct port:** plug the USB cable into the **USB-Device port on the
-   right side panel**. The flat USB-A port on the front is only for a memory
+1. Set the USB mode to USBTMC: `Utility` > `Function` > `Configure` >
+   `Device` > choose `USBTMC`.
+2. Use the correct port: plug the USB cable into the USB-Device port on the
+   right side panel. The flat USB-A port on the front is only for a memory
    stick - it will *not* connect to a PC.
 3. Plug into the PC.
 
 If you skip step 1 the scope does not appear on the USB bus at all (no device,
 not even an "unknown device").
 
-On **Windows** you also need a VISA runtime so Python can talk USBTMC. The
-simplest is **NI-VISA** (free from National Instruments). Install it once.
+On Windows you also need a VISA runtime so Python can talk USBTMC. A common one is NI-VISA (free from National Instruments). Install it once.
 
 ---
 
@@ -84,7 +79,7 @@ measurements, save a waveform to CSV).
 
 ## What you can do
 
-**Measurements** (read straight from the scope):
+Measurements (read straight from the scope):
 
 ```python
 scope.measure(ch, "vpp")        # peak-to-peak voltage
@@ -97,8 +92,8 @@ scope.measure(ch, "pduty")      # +duty %        "nduty"  = -duty %
 scope.measure(ch, "overshoot")  # overshoot %    "preshoot" = preshoot %
 ```
 
-**Statistics** - `scope.stats(ch)` returns a dictionary with everything above
-**plus** values the firmware does not provide, computed from the waveform:
+Statistics - `scope.stats(ch)` returns a dictionary with everything above
+plus values the firmware does not provide, computed from the waveform:
 
 ```
 vmax, vmin, vpp, vmean, vrms   (computed here)
@@ -106,7 +101,7 @@ vamp, vtop, vbase, freq, period, rtime, pwidth, nwidth,
 pduty, nduty, overshoot, preshoot   (from the scope)
 ```
 
-**Waveforms:**
+Waveforms:
 
 ```python
 scope.capture(ch)        # the on-screen wave (~1500 points, fast)
@@ -114,7 +109,7 @@ scope.capture_deep(ch)   # the deep-memory record (thousands of points)
 ```
 Both return `time`, `volts`, `raw` (ADC codes) and the scope settings.
 
-**Control:**
+Control:
 
 ```python
 scope.run()              # start acquiring
@@ -136,25 +131,25 @@ code to volts:
 volts = code * volts_per_division / 6400
 ```
 
-`6400` means **6400 codes per vertical division**. This was measured directly: a
-known **2.0 Vpp** signal produced exactly 6400 codes per division, and the
+`6400` means 6400 codes per vertical division. This was measured directly: a
+known 2.0 Vpp signal produced exactly 6400 codes per division, and the
 converted values match the scope's own Vpp reading. So it is verified, not a
 guess. It lives in `dos1104.py` as `CODES_PER_DIV` if you ever need to change it.
 
 A full list of every SCPI command the scope understands, with an explanation of
-each one, is in **[SCPI_COMMANDS.md](SCPI_COMMANDS.md)**.
+each one, is in [SCPI_COMMANDS.md](SCPI_COMMANDS.md).
 
 ---
 
 ## Troubleshooting
 
-- **Scope not found / not in Device Manager:** you missed the USBTMC menu step
+- Scope not found / not in Device Manager: you missed the USBTMC menu step
   above, or you are on the front USB-A port. Fix the menu + port, then replug.
-- **Everything times out after a stopped program:** a half-finished waveform
-  download can leave the USB link out of sync. **Unplug and replug the scope's
-  USB** (or power-cycle it) and it works again. The driver also clears the link
+- Everything times out after a stopped program: a half-finished waveform
+  download can leave the USB link out of sync. Unplug and replug the scope's
+  USB (or power-cycle it) and it works again. The driver also clears the link
   on connect and after failures to avoid this.
-- **`screenshot()` times out:** the bitmap command is not implemented on every
+- `screenshot()` times out: the bitmap command is not implemented on every
   firmware build. The waveform download (`capture` / `capture_deep`) is the
   reliable way to get the trace.
 

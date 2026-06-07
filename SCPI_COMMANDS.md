@@ -2,15 +2,15 @@
 
 This is the list of SCPI commands the Hanmatek DOS1104 understands, recovered by
 inspecting the official "DS Wave" PC software (an Owon program) plus testing on a
-real DOS1104 (firmware V1.2.0). The DOS1104 uses the **Owon SDS1104** command
+real DOS1104 (firmware V1.2.0). The DOS1104 uses the Owon SDS1104 command
 set, so this should apply to that family too.
 
 Two important things about how the scope talks:
 
-- **Every reply ends with `->`.** A query like `:CH1:SCAL?` answers `1.00V->`.
+- Every reply ends with `->`. A query like `:CH1:SCAL?` answers `1.00V->`.
   Strip the `->` before using the value. Measurements also carry a label and
   units, e.g. `:MEAS:CH1:PKPK?` returns `Vpp : 2.040V->`.
-- **Waveform downloads are binary.** The reply is `[4 bytes = length][payload]`,
+- Waveform downloads are binary. The reply is `[4 bytes = length][payload]`,
   little-endian length. For a `HEAD?` query the payload is JSON text; for a
   channel-data query the payload is the samples as 16-bit little-endian integers.
 
@@ -101,7 +101,7 @@ Format: `:MEAS:CH<n>:<TYPE>?`. The reply is a labelled value, e.g.
 | `OVERSHOOT` (tested) | Os | Overshoot (%) |
 | `PRESHOOT` (tested) | Ps | Preshoot (%) |
 
-**Not available over SCPI:** `Vmax`, `Vmin`, `Vmean`, `Vrms`. The PC software
+Not available over SCPI: `Vmax`, `Vmin`, `Vmean`, `Vrms`. The PC software
 computes those itself from the downloaded waveform - so does this driver, in
 `stats()`. (`Vmax = max sample`, `Vmin = min sample`, `Vpp = max - min`,
 `Vmean = average`, `Vrms = root-mean-square`.)
@@ -112,7 +112,7 @@ computes those itself from the downloaded waveform - so does this driver, in
 
 Each of these returns a binary block: `[4-byte little-endian length][payload]`.
 
-**Screen view** (what is currently drawn, ~1500 points - fast):
+Screen view (what is currently drawn, ~1500 points - fast):
 
 | Command | Payload |
 |---|---|
@@ -120,7 +120,7 @@ Each of these returns a binary block: `[4-byte little-endian length][payload]`.
 | `:DATA:WAVE:SCREEN:CH<n>?` (tested) | The channel samples, 16-bit little-endian integers (ADC codes). |
 | `:DATA:WAVE:SCREEN:BMP?` (unverified) | A screenshot as a BMP image. (Times out on some firmware.) |
 
-**Deep memory** (the full acquisition record, thousands of points - slower, more
+Deep memory (the full acquisition record, thousands of points - slower, more
 detail):
 
 | Command | Payload |
@@ -199,12 +199,12 @@ The DOS1104 firmware is shared across a product line that also includes a
 multimeter and an arbitrary-waveform generator. These commands appear in the
 software; they only do something on units that have that hardware.
 
-**Multimeter (DMM):**
+Multimeter (DMM):
 `:FUNC DCV|ACV|DCA|ACA|RES|CAP|DIOD|BEEP`, `:VOLT:DC`, `:VOLT:AC`,
 `:CURR:DC`, `:CURR:AC`, `:RES`, `:DIOD`, `:RANG <range>`, `:REL`, `:UNIT <u>`,
 `:READ?` (read the current measurement), `:STEP`.
 
-**Built-in generator:**
+Built-in generator:
 `:function sine|square|ramp|pulse|arb`, `:function:freq <hz>`,
 `:function:ampl <v>`, `:function:offset <v>`, `:function:high <v>`,
 `:function:low <v>`, `:function:period <s>`, `:function:pulse:dtycycle <%>`,

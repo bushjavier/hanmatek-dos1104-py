@@ -1,8 +1,8 @@
 """
-dos1104.py - Simple Python driver for the Hanmatek DOS1104 oscilloscope.
+dos1104.py - Python driver for the Hanmatek DOS1104 oscilloscope.
 
 The DOS1104 is a 4-channel scope that speaks the Owon SDS1104 SCPI dialect over
-USB (USBTMC). This single file lets you, from a PC:
+USB (USBTMC). It lets you, from a PC:
 
   * read measurements (Vpp, Vamp, Vtop, frequency, duty, ...)
   * compute full statistics from the captured wave (Vmax, Vmin, Vmean, Vrms)
@@ -17,7 +17,7 @@ IMPORTANT - getting the scope to show up on the PC (the part nobody documents):
   2. Use the USB-Device port on the RIGHT side panel (not the front USB-A, that
      one is only for a memory stick).
   3. Plug into the PC. On Windows you also need a VISA runtime installed
-     (NI-VISA is the easy one). Then this driver finds the scope automatically.
+     (NI-VISA is a common one). Then this driver finds the scope automatically.
 
 Tested with a Hanmatek DOS1104 (firmware V1.2.0). It very likely also works with
 other scopes of the same family (Owon SDS1104 and rebadges), but that is not
@@ -44,7 +44,7 @@ CODES_PER_DIV = 6400.0
 # alternates seen in the wild). We try them in order when auto-detecting.
 USB_PATTERNS = ("?*::0x5345::0x1235::?*", "?*::21317::4661::?*")
 
-# Map a friendly name -> the short SCPI word the firmware understands.
+# Map a short name -> the SCPI word the firmware understands.
 # These are the measurements the DOS1104 firmware actually answers.
 # (It does NOT answer Vmax/Vmin/Vmean/Vrms - use stats() for those.)
 MEASUREMENTS = {
@@ -103,7 +103,7 @@ class DOS1104:
     """
     A connection to one DOS1104 scope.
 
-    Easiest use (auto-find the scope):
+    Basic use (auto-find the scope):
 
         scope = DOS1104.connect()
         print(scope.idn())
@@ -344,7 +344,7 @@ class DOS1104:
         return raw[4:4 + length]
 
     def _build_wave(self, head, sample_bytes, channel):
-        """Turn the raw header + bytes into the friendly result dictionary."""
+        """Turn the raw header + bytes into the result dictionary."""
         codes = np.frombuffer(sample_bytes, dtype="<i2")   # 16-bit, little-endian
         samplerate = self._samplerate(head)
         dt = 1.0 / samplerate if samplerate else 0.0
@@ -390,7 +390,7 @@ class DOS1104:
             raise ValueError("channel must be 1, 2, 3 or 4")
 
 
-# A tiny demo when you run this file directly:  python dos1104.py
+# Demo: run this file directly with  python dos1104.py
 if __name__ == "__main__":
     with DOS1104.connect() as scope:
         print("Connected to:", scope.idn())

@@ -24,7 +24,7 @@ with DOS1104.connect() as scope:
     print("Got %d points at %.0f samples/second."
           % (wave["volts"].size, wave["samplerate"]))
 
-    # Write a simple two-column CSV: time in seconds, voltage in volts.
+    # Write a two-column CSV: time in seconds, voltage in volts.
     with open(OUTPUT, "w") as f:
         f.write("time_s,volts\n")
         for t, v in zip(wave["time"], wave["volts"]):
