@@ -9,12 +9,12 @@ Two important things about how the scope talks:
 
 - **Every reply ends with `->`.** A query like `:CH1:SCAL?` answers `1.00V->`.
   Strip the `->` before using the value. Measurements also carry a label and
-  units, e.g. `:MEAS:CH1:PKPK?` → `Vpp : 2.040V->`.
+  units, e.g. `:MEAS:CH1:PKPK?` returns `Vpp : 2.040V->`.
 - **Waveform downloads are binary.** The reply is `[4 bytes = length][payload]`,
   little-endian length. For a `HEAD?` query the payload is JSON text; for a
   channel-data query the payload is the samples as 16-bit little-endian integers.
 
-Legend: ✅ = tested and working on the DOS1104; ▫ = found in the software, not
+Legend: `(tested)` = verified working on the DOS1104; (unverified) = found in the software, not
 individually verified here.
 
 ---
@@ -23,11 +23,11 @@ individually verified here.
 
 | Command | What it does |
 |---|---|
-| `*IDN?` ✅ | Identify: returns `HANMATEK,DOS1104,<serial>,<firmware>`. |
-| `:MODEL?` ▫ | Returns the model code. |
-| `:SCPI:DISP?` ▫ | Query SCPI display info. |
-| `:SCPION` ▫ | Enable SCPI mode. |
-| `:BEEP` ▫ | Buzzer. |
+| `*IDN?` (tested) | Identify: returns `HANMATEK,DOS1104,<serial>,<firmware>`. |
+| `:MODEL?` (unverified) | Returns the model code. |
+| `:SCPI:DISP?` (unverified) | Query SCPI display info. |
+| `:SCPION` (unverified) | Enable SCPI mode. |
+| `:BEEP` (unverified) | Buzzer. |
 
 ---
 
@@ -35,25 +35,25 @@ individually verified here.
 
 | Command | What it does |
 |---|---|
-| `:RUNning RUN` ✅ | Start continuous acquisition. |
-| `:RUNning STOP` ✅ | Stop acquisition (freeze the screen). |
-| `:AUTOset on` ▫ | Autoset — auto-scale to the input signal. |
-| `:SelfCorrect on` ▫ | Run the scope's internal self-calibration. |
+| `:RUNning RUN` (tested) | Start continuous acquisition. |
+| `:RUNning STOP` (tested) | Stop acquisition (freeze the screen). |
+| `:AUTOset on` (unverified) | Autoset - auto-scale to the input signal. |
+| `:SelfCorrect on` (unverified) | Run the scope's internal self-calibration. |
 
 ---
 
 ## Channels (vertical)
 
-`<n>` is the channel number 1–4. Replies include units and `->`.
+`<n>` is the channel number 1-4. Replies include units and `->`.
 
 | Command | What it does |
 |---|---|
-| `:CH<n>:SCAL?` / `:CH<n>:SCAL <v>` ✅ | Volts per division. Query gives e.g. `1.00V`. |
-| `:CH<n>:OFFS?` / `:CH<n>:OFFS <v>` ✅ | Vertical offset. |
-| `:CH<n>:COUP?` / `:CH<n>:COUP <DC\|AC>` ✅ | Input coupling. |
-| `:CH<n>:PROB?` / `:CH<n>:PROB <1X\|10X\|...>` ✅ | Probe attenuation. Set this to match your probe, or readings are wrong. |
-| `:CH<n>:DISP?` / `:CH<n>:DISP <ON\|OFF>` ✅ | Show/hide the channel. |
-| `:CH<n>:INVERSE <ON\|OFF>` ▫ | Invert the trace. |
+| `:CH<n>:SCAL?` / `:CH<n>:SCAL <v>` (tested) | Volts per division. Query gives e.g. `1.00V`. |
+| `:CH<n>:OFFS?` / `:CH<n>:OFFS <v>` (tested) | Vertical offset. |
+| `:CH<n>:COUP?` / `:CH<n>:COUP <DC\|AC>` (tested) | Input coupling. |
+| `:CH<n>:PROB?` / `:CH<n>:PROB <1X\|10X\|...>` (tested) | Probe attenuation. Set this to match your probe, or readings are wrong. |
+| `:CH<n>:DISP?` / `:CH<n>:DISP <ON\|OFF>` (tested) | Show/hide the channel. |
+| `:CH<n>:INVERSE <ON\|OFF>` (unverified) | Invert the trace. |
 
 ---
 
@@ -61,8 +61,8 @@ individually verified here.
 
 | Command | What it does |
 |---|---|
-| `:HORIzontal:Scale?` / `:HORIzontal:Scale <t>` ▫ | Seconds per division. |
-| `:HORIzontal:OFFSET?` / `:HORIzontal:OFFSET <t>` ▫ | Horizontal position. |
+| `:HORIzontal:Scale?` / `:HORIzontal:Scale <t>` (unverified) | Seconds per division. |
+| `:HORIzontal:OFFSET?` / `:HORIzontal:OFFSET <t>` (unverified) | Horizontal position. |
 
 ---
 
@@ -70,9 +70,9 @@ individually verified here.
 
 | Command | What it does |
 |---|---|
-| `:ACQUire:Mode <mode>` ▫ | Acquire mode (e.g. SAMPle, average, peak). |
-| `:ACQUIRE:DEPMEM <depth>` ▫ | Memory depth (e.g. `5K`). |
-| `:ACQUire:average:num <n>` ▫ | Number of averages when in average mode. |
+| `:ACQUire:Mode <mode>` (unverified) | Acquire mode (e.g. SAMPle, average, peak). |
+| `:ACQUIRE:DEPMEM <depth>` (unverified) | Memory depth (e.g. `5K`). |
+| `:ACQUire:average:num <n>` (unverified) | Number of averages when in average mode. |
 
 The current acquisition info also comes back inside the waveform `HEAD?` JSON
 (`SAMPLE.SAMPLERATE`, `SAMPLE.DEPMEM`, `SAMPLE.DATALEN`, `SAMPLE.TYPE`).
@@ -83,27 +83,27 @@ The current acquisition info also comes back inside the waveform `HEAD?` JSON
 
 Format: `:MEAS:CH<n>:<TYPE>?`. The reply is a labelled value, e.g.
 `Vpp : 2.040V->`. If the scope cannot measure it right now the value is `?`
-(e.g. frequency with no signal → `F :   ?->`).
+(e.g. frequency with no signal: `F :   ?->`).
 
 | TYPE | Reply label | Meaning |
 |---|---|---|
-| `PKPK` ✅ | Vpp | Peak-to-peak voltage |
-| `VAMP` ✅ | Va | Amplitude (top − base) |
-| `VTOP` ✅ | Vt | Top (the flat high level) |
-| `VBAS` ✅ | Vb | Base (the flat low level) |
-| `FREQ` ✅ | F | Frequency |
-| `PER` ✅ | T | Period |
-| `RTIME` ✅ | RT | Rise time |
-| `PWIDTH` ✅ | PW | Positive pulse width |
-| `NWIDTH` ✅ | NW | Negative pulse width |
-| `PDUTY` ✅ | +D | Positive duty cycle (%) |
-| `NDUTY` ✅ | −D | Negative duty cycle (%) |
-| `OVERSHOOT` ✅ | Os | Overshoot (%) |
-| `PRESHOOT` ✅ | Ps | Preshoot (%) |
+| `PKPK` (tested) | Vpp | Peak-to-peak voltage |
+| `VAMP` (tested) | Va | Amplitude (top - base) |
+| `VTOP` (tested) | Vt | Top (the flat high level) |
+| `VBAS` (tested) | Vb | Base (the flat low level) |
+| `FREQ` (tested) | F | Frequency |
+| `PER` (tested) | T | Period |
+| `RTIME` (tested) | RT | Rise time |
+| `PWIDTH` (tested) | PW | Positive pulse width |
+| `NWIDTH` (tested) | NW | Negative pulse width |
+| `PDUTY` (tested) | +D | Positive duty cycle (%) |
+| `NDUTY` (tested) | -D | Negative duty cycle (%) |
+| `OVERSHOOT` (tested) | Os | Overshoot (%) |
+| `PRESHOOT` (tested) | Ps | Preshoot (%) |
 
 **Not available over SCPI:** `Vmax`, `Vmin`, `Vmean`, `Vrms`. The PC software
-computes those itself from the downloaded waveform — so does this driver, in
-`stats()`. (`Vmax = max sample`, `Vmin = min sample`, `Vpp = max − min`,
+computes those itself from the downloaded waveform - so does this driver, in
+`stats()`. (`Vmax = max sample`, `Vmin = min sample`, `Vpp = max - min`,
 `Vmean = average`, `Vrms = root-mean-square`.)
 
 ---
@@ -112,22 +112,22 @@ computes those itself from the downloaded waveform — so does this driver, in
 
 Each of these returns a binary block: `[4-byte little-endian length][payload]`.
 
-**Screen view** (what is currently drawn, ~1500 points — fast):
+**Screen view** (what is currently drawn, ~1500 points - fast):
 
 | Command | Payload |
 |---|---|
-| `:DATA:WAVE:SCREEN:HEAD?` ✅ | JSON text with timebase, sample rate, per-channel scale/probe/offset, trigger info. |
-| `:DATA:WAVE:SCREEN:CH<n>?` ✅ | The channel samples, 16-bit little-endian integers (ADC codes). |
-| `:DATA:WAVE:SCREEN:BMP?` ▫ | A screenshot as a BMP image. (Times out on some firmware.) |
+| `:DATA:WAVE:SCREEN:HEAD?` (tested) | JSON text with timebase, sample rate, per-channel scale/probe/offset, trigger info. |
+| `:DATA:WAVE:SCREEN:CH<n>?` (tested) | The channel samples, 16-bit little-endian integers (ADC codes). |
+| `:DATA:WAVE:SCREEN:BMP?` (unverified) | A screenshot as a BMP image. (Times out on some firmware.) |
 
-**Deep memory** (the full acquisition record, thousands of points — slower, more
+**Deep memory** (the full acquisition record, thousands of points - slower, more
 detail):
 
 | Command | Payload |
 |---|---|
-| `:DATA:WAVE:DEPMEM:HEAD?` ✅ | Same kind of JSON header as above. |
-| `:DATA:WAVE:DEPMEM:CH<n>?` ✅ | Deep-memory samples, 16-bit little-endian. |
-| `:DATA:WAVE:DEPMEM:All?` ▫ | All channels' deep memory at once. |
+| `:DATA:WAVE:DEPMEM:HEAD?` (tested) | Same kind of JSON header as above. |
+| `:DATA:WAVE:DEPMEM:CH<n>?` (tested) | Deep-memory samples, 16-bit little-endian. |
+| `:DATA:WAVE:DEPMEM:All?` (unverified) | All channels' deep memory at once. |
 
 To turn the 16-bit codes into volts:
 `volts = code * volts_per_division / 6400` (see the header for each channel's
@@ -149,7 +149,7 @@ Example `HEAD?` JSON (trimmed):
 
 ## Trigger
 
-The DOS1104 uses a single-trigger command tree. (All ▫ — present in the software;
+The DOS1104 uses a single-trigger command tree. (All of these are unverified - present in the software;
 adjust to taste and verify on your unit.)
 
 | Command | What it does |
@@ -177,10 +177,10 @@ adjust to taste and verify on your unit.)
 
 | Command | What it does |
 |---|---|
-| `:SAVE:READ:HEAD?` ▫ | Header for a stored capture. |
-| `:SAVE:READ:DATA <...>` ▫ | Read stored capture data. |
-| `:FILE:Download <...>` ▫ | Download a file from the scope. |
-| `:FILE:UPLoad <...>` ▫ | Upload a file to the scope. |
+| `:SAVE:READ:HEAD?` (unverified) | Header for a stored capture. |
+| `:SAVE:READ:DATA <...>` (unverified) | Read stored capture data. |
+| `:FILE:Download <...>` (unverified) | Download a file from the scope. |
+| `:FILE:UPLoad <...>` (unverified) | Upload a file to the scope. |
 
 ---
 
@@ -188,8 +188,8 @@ adjust to taste and verify on your unit.)
 
 | Command | What it does |
 |---|---|
-| `:FFT:ch <n>` ▫ | Choose the FFT source channel. |
-| `:FFT:display <ON\|OFF>` ▫ | Show/hide the FFT. |
+| `:FFT:ch <n>` (unverified) | Choose the FFT source channel. |
+| `:FFT:display <ON\|OFF>` (unverified) | Show/hide the FFT. |
 
 ---
 

@@ -5,7 +5,7 @@ A small, easy-to-read **Python driver for the Hanmatek DOS1104** oscilloscope
 measurements, compute statistics, and download waveforms from your PC.
 
 The DOS1104 uses the **Owon SDS1104** SCPI command set, so this driver will
-**probably also work with the Owon SDS1104 and its rebadges** — but it has only
+**probably also work with the Owon SDS1104 and its rebadges** - but it has only
 been **tested on a Hanmatek DOS1104 (firmware V1.2.0)**. If you try it on another
 model, please open an issue and say whether it worked.
 
@@ -19,11 +19,11 @@ comments. You do not need to be a Python expert to use it.
 Most people get stuck here, and it is not documented anywhere. Do this **on the
 scope**, in order:
 
-1. **Set the USB mode to USBTMC:** `Utility` → `Function` → `Configure` →
-   `Device` → choose **`USBTMC`**.
+1. **Set the USB mode to USBTMC:** `Utility` > `Function` > `Configure` >
+   `Device` > choose **`USBTMC`**.
 2. **Use the correct port:** plug the USB cable into the **USB-Device port on the
    right side panel**. The flat USB-A port on the front is only for a memory
-   stick — it will *not* connect to a PC.
+   stick - it will *not* connect to a PC.
 3. Plug into the PC.
 
 If you skip step 1 the scope does not appear on the USB bus at all (no device,
@@ -97,7 +97,7 @@ scope.measure(ch, "pduty")      # +duty %        "nduty"  = -duty %
 scope.measure(ch, "overshoot")  # overshoot %    "preshoot" = preshoot %
 ```
 
-**Statistics** — `scope.stats(ch)` returns a dictionary with everything above
+**Statistics** - `scope.stats(ch)` returns a dictionary with everything above
 **plus** values the firmware does not provide, computed from the waveform:
 
 ```
@@ -162,7 +162,7 @@ each one, is in **[SCPI_COMMANDS.md](SCPI_COMMANDS.md)**.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Do whatever you like with it.
+MIT - see [LICENSE](LICENSE). Do whatever you like with it.
 
 This is an independent, community driver. It is not affiliated with Hanmatek or
 Owon. The driver code is original; the SCPI command names come from the public
