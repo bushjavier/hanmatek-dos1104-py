@@ -53,8 +53,9 @@ when stopped).
 
 ## Channels (vertical)
 
-`<n>` is the channel number 1-4. Replies include units and `->`. All of these
-were tested (query and set) on channel 1.
+`<n>` is the channel number 1-4. Replies include units and `->`. These were
+tested (query and set). Waveform capture works on all four channels; a
+measurement returns a value on any channel whose display is ON.
 
 | Command | Status | What it does |
 |---|---|---|
@@ -72,7 +73,7 @@ were tested (query and set) on channel 1.
 | Command | Status | What it does |
 |---|---|---|
 | `:HORIzontal:Scale?` / `:HORIzontal:Scale <t>` | tested | Seconds per division. Query gives e.g. `500us`; set e.g. `:HORIzontal:Scale 200us`. |
-| `:HORIzontal:OFFSET?` / `:HORIzontal:OFFSET <t>` | tested (query) | Horizontal position. *The query reads back; the exact set value/format was not pinned down.* |
+| `:HORIzontal:OFFSET?` / `:HORIzontal:OFFSET <t>` | tested | Horizontal position. Query and set both work (e.g. `:HORIzontal:OFFSET 500us`). |
 
 ---
 
@@ -81,8 +82,8 @@ were tested (query and set) on channel 1.
 | Command | Status | What it does |
 |---|---|---|
 | `:ACQUire:Mode?` / `:ACQUire:Mode <SAMPle\|AVERage\|...>` | tested | Acquire mode. |
-| `:ACQUire:average:num?` / `:ACQUire:average:num <n>` | tested (query) | Number of averages. *Setting it only takes effect while in AVERage mode.* |
-| `:ACQUIRE:DEPMEM?` / `:ACQUIRE:DEPMEM <depth>` | tested (query) | Memory depth (e.g. `5K`). *Query reads back; only the model's allowed depth values are accepted on set.* |
+| `:ACQUire:average:num?` / `:ACQUire:average:num <n>` | tested | Number of averages. Set takes effect while in AVERage mode (verified 4 -> 16). |
+| `:ACQUIRE:DEPMEM?` / `:ACQUIRE:DEPMEM <depth>` | tested (query) | Memory depth (e.g. `5K`). *Query reads back; setting it had no effect on V1.2.0 - the depth appears fixed/auto.* |
 
 The current acquisition info also comes back inside the waveform `HEAD?` JSON
 (`SAMPLE.SAMPLERATE`, `SAMPLE.DEPMEM`, `SAMPLE.DATALEN`, `SAMPLE.TYPE`).
