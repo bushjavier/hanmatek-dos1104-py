@@ -32,8 +32,9 @@ Use the keywords exactly as written below. Some accept the long form only, e.g.
 | `*IDN?` | tested | Identify: returns `HANMATEK,DOS1104,<serial>,<firmware>`. |
 | `:MODEL?` | tested | Returns the model code (e.g. `110410101`). |
 | `:BEEP` | tested | Sounds the buzzer. |
-| `:SCPION` | tested | Enable SCPI mode (accepted, no readback). |
-| `:SCPI:DISP?` | *no reply on V1.2.0* | Query SCPI display info. |
+
+(`:SCPION` and `:SCPI:DISP?` look like system commands but are not - they belong
+to the multimeter, see the "Not present" section at the end.)
 
 ---
 
@@ -64,7 +65,7 @@ measurement returns a value on any channel whose display is ON.
 | `:CH<n>:COUP?` / `:CH<n>:COUP <DC\|AC>` | tested | Input coupling. |
 | `:CH<n>:PROB?` / `:CH<n>:PROB <1X\|10X\|...>` | tested | Probe attenuation. Set this to match your probe, or readings are wrong. |
 | `:CH<n>:DISP?` / `:CH<n>:DISP <ON\|OFF>` | tested | Show/hide the channel. |
-| `:CH<n>:INVERSE <ON\|OFF>` | tested | Invert the trace (accepted; there is no query to read it back). |
+| `:CH<n>:INVERSE <ON\|OFF>` | tested | Flip the trace vertically (multiply the channel by -1). Useful to compare against another channel or to undo a probe inversion. The scope accepts it but offers no query to read the state back. |
 
 ---
 
@@ -161,26 +162,27 @@ Example `HEAD?` JSON (trimmed):
 
 Single-trigger command tree. `:MODE?`, `:SOURce` and `:EDGE:SOURce?` were tested
 (e.g. setting `:TRIGger:SINGle:SOURce CH2` then reading `:EDGE:SOURce?` returns
-`CH2`). The other entries are part of the same working tree but were not each
-read back individually.
+`CH2`). The rest are marked *set only*: the scope accepts them and acts on them,
+but there is no query (`?`) form to read the value back over SCPI, so they cannot
+be auto-verified. Descriptions below explain what each one controls.
 
 | Command | Status | What it does |
 |---|---|---|
-| `:TRIGger:SINGle:MODE?` / `:TRIGger:SINGle:MODE <mode>` | tested | Trigger mode (returns e.g. `EDGE`). |
-| `:TRIGger:SINGle:SOURce CH<n>` | tested | Trigger source channel. |
-| `:TRIGger:SINGle:EDGE:SOURce?` | tested | Read the edge source. |
-| `:TRIGger:SINGle:EDGE <RISE\|FALL>` | *set only* | Edge slope. |
-| `:TRIGger:SINGle:EDGe:LEVel <v>` | *set only* | Trigger level. |
-| `:TRIGger:SINGle:COUPling <c>` | *set only* | Trigger coupling. |
-| `:TRIGger:SINGle:Sweep <AUTO\|NORMAL\|SINGLE>` | *set only* | Sweep mode. |
-| `:TRIGger:SINGle:HoldOff <t>` | *set only* | Hold-off time. |
-| `:TRIGger:SINGle:Slope <s>` | *set only* | Slope-trigger settings. |
-| `:TRIGger:SINGle:Time <t>` | *set only* | Time setting (pulse/time trigger). |
-| `:TRIGger:SINGle:Sync <s>` | *set only* | Sync (video trigger). |
-| `:TRIGger:SINGle:LineNum <n>` | *set only* | Video line number. |
-| `:TRIGger:SINGle:polarity <p>` | *set only* | Polarity (video/pulse). |
-| `:TRIGger:SINGle:LLevel <v>` / `:ULevel <v>` | *set only* | Lower / upper level (window trigger). |
-| `:TRIGger:SINGle:SIGN <s>` | *set only* | Sign / condition. |
+| `:TRIGger:SINGle:MODE?` / `:TRIGger:SINGle:MODE <mode>` | tested | The trigger type: EDGE, pulse, video, slope, etc. Query returns e.g. `EDGE`. |
+| `:TRIGger:SINGle:SOURce CH<n>` | tested | Which input channel the trigger watches. |
+| `:TRIGger:SINGle:EDGE:SOURce?` | tested | Reads back the edge-trigger source channel. |
+| `:TRIGger:SINGle:EDGE <RISE\|FALL>` | *set only* | For edge trigger: fire on the rising edge or the falling edge. |
+| `:TRIGger:SINGle:EDGe:LEVel <v>` | *set only* | The voltage threshold the signal must cross to trigger. |
+| `:TRIGger:SINGle:COUPling <c>` | *set only* | How the trigger path is filtered before the comparator (DC, AC, HF-reject, LF-reject, noise-reject). |
+| `:TRIGger:SINGle:Sweep <AUTO\|NORMAL\|SINGLE>` | *set only* | When the scope draws: AUTO = free-run if no trigger arrives; NORMAL = only when a trigger occurs; SINGLE = capture one trigger then stop. |
+| `:TRIGger:SINGle:HoldOff <t>` | *set only* | Dead time after a trigger during which new triggers are ignored - helps lock onto repetitive but complex waveforms. |
+| `:TRIGger:SINGle:Slope <s>` | *set only* | Settings for the slope trigger (fire on a rate of change rather than a level). |
+| `:TRIGger:SINGle:Time <t>` | *set only* | The time/width threshold for pulse-width and timeout triggers. |
+| `:TRIGger:SINGle:Sync <s>` | *set only* | Video trigger sync type (line/field) for TV-style signals. |
+| `:TRIGger:SINGle:LineNum <n>` | *set only* | Which video line to trigger on (video trigger). |
+| `:TRIGger:SINGle:polarity <p>` | *set only* | Pulse/video polarity: positive-going or negative-going. |
+| `:TRIGger:SINGle:LLevel <v>` / `:ULevel <v>` | *set only* | Lower and upper thresholds for the window trigger (fire when the signal enters/leaves the band between them). |
+| `:TRIGger:SINGle:SIGN <s>` | *set only* | The comparison for the pulse-width trigger (wider than / narrower than / inside a range). |
 | `:TRIGger:SINGle:System <s>` | *set only* | Trigger system setting. |
 
 ---
@@ -211,10 +213,14 @@ USB directly, and saved captures come back through `:SAVE:READ:*` above.
 
 ## FFT
 
+The FFT view shows the frequency spectrum (the math transform) of a channel.
+Both commands are accepted but there is no working query on V1.2.0, so the state
+cannot be read back over SCPI.
+
 | Command | Status | What it does |
 |---|---|---|
-| `:FFT:display <ON\|OFF>` | *set accepted; query empty on V1.2.0* | Show/hide the FFT. |
-| `:FFT:ch <n>` | *set only* | Choose the FFT source channel. |
+| `:FFT:display <ON\|OFF>` | *set accepted; query empty on V1.2.0* | Turn the FFT (spectrum) view on or off. |
+| `:FFT:ch <n>` | *set only* | Choose which input channel the FFT is computed from. |
 
 ---
 
@@ -227,7 +233,13 @@ family.
 
 Multimeter: `:FUNC DCV|ACV|DCA|ACA|RES|CAP|DIOD|BEEP`, `:VOLT:DC`, `:VOLT:AC`,
 `:CURR:DC`, `:CURR:AC`, `:RES`, `:DIOD`, `:RANG <range>`, `:REL`, `:UNIT <u>`,
-`:READ?`, `:STEP`.
+`:READ?`, `:STEP`, `:SCPION`, `:SCPI:DISP?`.
+
+(`:SCPION` and `:SCPI:DISP?` look like general SCPI commands but they are
+multimeter commands - in the software they are handled by the "SCPI MultiMeter"
+class, `SCPIMMAction` / `ScpiMMFrm`. On the DOS1104 they return nothing. Verified:
+`:SCPION` then `:SCPI:DISP?`, plus `:SCPI:DISPlay?` and `:DISPlay?`, all reply
+empty.)
 
 Generator: `:function sine|square|ramp|pulse|arb`, `:function:freq <hz>`,
 `:function:ampl <v>`, `:function:offset <v>`, `:function:high <v>`,
