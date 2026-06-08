@@ -45,13 +45,18 @@ CODES_PER_DIV = 6400.0
 USB_PATTERNS = ("?*::0x5345::0x1235::?*", "?*::21317::4661::?*")
 
 # Map a short name -> the SCPI word the firmware understands.
-# These are the measurements the DOS1104 firmware actually answers.
-# (It does NOT answer Vmax/Vmin/Vmean/Vrms - use stats() for those.)
+# These are the measurements the DOS1104 firmware answers directly. The scope
+# computes all of them itself (including max/min/mean/rms) - note their SCPI
+# words are MAX/MIN/AVER/CYCRMS, not the obvious Vmax/Vmin/etc.
 MEASUREMENTS = {
+    "vmax": "MAX",          # maximum voltage
+    "vmin": "MIN",          # minimum voltage
     "vpp": "PKPK",          # peak-to-peak voltage
     "vamp": "VAMP",         # amplitude (top - base)
     "vtop": "VTOP",         # top (flat high level)
     "vbase": "VBAS",        # base (flat low level)
+    "vmean": "AVER",        # average (mean) voltage
+    "vrms": "CYCRMS",       # rms over one cycle
     "freq": "FREQ",         # frequency
     "period": "PER",        # period
     "rtime": "RTIME",       # rise time
@@ -230,30 +235,37 @@ class DOS1104:
         """
         Return a full set of statistics for a channel, as a dictionary.
 
-        Vmax, Vmin, Vpp, Vmean and Vrms are computed here from the downloaded
-        waveform (the firmware does not provide those four). The rest come
-        straight from the scope. Handy to validate a signal in one call.
+        Every value (including Vmax/Vmin/Vmean/Vrms) is read straight from the
+        scope's own measurement engine. If a model in the family does not answer
+        one of the level stats, it is filled in from the downloaded waveform as a
+        fallback. Handy to validate a signal in one call.
         """
         self._check_channel(channel)
         result = {}
-        # First the firmware measurements (these are single quick questions).
-        for kind in ("vamp", "vtop", "vbase", "freq", "period", "rtime",
+        for kind in ("vmax", "vmin", "vpp", "vamp", "vtop", "vbase",
+                     "vmean", "vrms", "freq", "period", "rtime",
                      "pwidth", "nwidth", "pduty", "nduty",
                      "overshoot", "preshoot"):
             try:
                 result[kind] = self.measure(channel, kind)
             except Exception:
                 result[kind] = None
-        # Then download the wave and compute the level stats from it.
-        wave = self.capture(channel)
-        v = wave["volts"]
-        result["vmax"] = float(v.max())
-        result["vmin"] = float(v.min())
-        result["vpp"] = float(v.max() - v.min())
-        result["vmean"] = float(v.mean())
-        result["vrms"] = float(np.sqrt(np.mean(v * v)))
-        result["points"] = int(v.size)
-        result["samplerate"] = wave["samplerate"]
+
+        # Fallback: if the scope did not return a level stat, compute it from the
+        # waveform (keeps this working on other family models that may lack one).
+        missing = [k for k in ("vmax", "vmin", "vpp", "vmean", "vrms")
+                   if result.get(k) is None]
+        if missing:
+            v = self.capture(channel)["volts"]
+            local = {
+                "vmax": float(v.max()),
+                "vmin": float(v.min()),
+                "vpp": float(v.max() - v.min()),
+                "vmean": float(v.mean()),
+                "vrms": float(np.sqrt(np.mean(v * v))),
+            }
+            for k in missing:
+                result[k] = local[k]
         return result
 
     # ------------------------------------------------------------- waveforms

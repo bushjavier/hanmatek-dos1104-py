@@ -82,23 +82,26 @@ measurements, save a waveform to CSV).
 Measurements (read straight from the scope):
 
 ```python
+scope.measure(ch, "vmax")       # maximum    "vmin" = minimum
+scope.measure(ch, "vmean")      # mean       "vrms" = rms (per cycle)
 scope.measure(ch, "vpp")        # peak-to-peak voltage
 scope.measure(ch, "vamp")       # amplitude (top - base)
-scope.measure(ch, "vtop")       # top / "vbase" = base
-scope.measure(ch, "freq")       # frequency      "period" = period
+scope.measure(ch, "vtop")       # top        "vbase" = base
+scope.measure(ch, "freq")       # frequency  "period" = period
 scope.measure(ch, "rtime")      # rise time
 scope.measure(ch, "pwidth")     # +pulse width   "nwidth" = -pulse width
 scope.measure(ch, "pduty")      # +duty %        "nduty"  = -duty %
 scope.measure(ch, "overshoot")  # overshoot %    "preshoot" = preshoot %
 ```
 
-Statistics - `scope.stats(ch)` returns a dictionary with everything above
-plus values the firmware does not provide, computed from the waveform:
+All of these come straight from the scope's own measurement engine (even
+max/min/mean/rms - their SCPI names are MAX/MIN/AVER/CYCRMS).
+
+Statistics - `scope.stats(ch)` returns a dictionary with all of them in one call:
 
 ```
-vmax, vmin, vpp, vmean, vrms   (computed here)
-vamp, vtop, vbase, freq, period, rtime, pwidth, nwidth,
-pduty, nduty, overshoot, preshoot   (from the scope)
+vmax, vmin, vpp, vamp, vtop, vbase, vmean, vrms,
+freq, period, rtime, pwidth, nwidth, pduty, nduty, overshoot, preshoot
 ```
 
 Waveforms:

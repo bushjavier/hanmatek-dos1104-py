@@ -99,10 +99,14 @@ Format: `:MEAS:CH<n>:<TYPE>?`. The reply is a labelled value, e.g.
 
 | TYPE | Reply label | Meaning |
 |---|---|---|
+| `MAX` | Ma | Maximum voltage |
+| `MIN` | Mi | Minimum voltage |
 | `PKPK` | Vpp | Peak-to-peak voltage |
 | `VAMP` | Va | Amplitude (top - base) |
 | `VTOP` | Vt | Top (the flat high level) |
 | `VBAS` | Vb | Base (the flat low level) |
+| `AVER` | V | Average (mean) voltage |
+| `CYCRMS` | TR | RMS over one cycle |
 | `FREQ` | F | Frequency |
 | `PER` | T | Period |
 | `RTIME` | RT | Rise time |
@@ -113,10 +117,10 @@ Format: `:MEAS:CH<n>:<TYPE>?`. The reply is a labelled value, e.g.
 | `OVERSHOOT` | Os | Overshoot (%) |
 | `PRESHOOT` | Ps | Preshoot (%) |
 
-Not available over SCPI: `Vmax`, `Vmin`, `Vmean`, `Vrms`. The PC software
-computes those from the downloaded waveform - so does this driver, in `stats()`.
-(`Vmax = max sample`, `Vmin = min sample`, `Vpp = max - min`,
-`Vmean = average`, `Vrms = root-mean-square`.)
+The scope computes max/min/mean/rms itself - note the SCPI words are
+`MAX`/`MIN`/`AVER`/`CYCRMS`, not the obvious `VMAX`/`VMIN`/`VAVG`/`VRMS` (those
+return nothing). The driver's `stats()` reads all of these straight from the
+scope.
 
 ---
 
