@@ -233,12 +233,9 @@ class DOS1104:
 
     def stats(self, channel):
         """
-        Return a full set of statistics for a channel, as a dictionary.
-
-        Every value (including Vmax/Vmin/Vmean/Vrms) is read straight from the
-        scope's own measurement engine. If a model in the family does not answer
-        one of the level stats, it is filled in from the downloaded waveform as a
-        fallback. Handy to validate a signal in one call.
+        Return a full set of statistics for a channel, as a dictionary. Every
+        value (including Vmax/Vmin/Vmean/Vrms) is read straight from the scope's
+        own measurement engine. Handy to validate a signal in one call.
         """
         self._check_channel(channel)
         result = {}
@@ -250,22 +247,6 @@ class DOS1104:
                 result[kind] = self.measure(channel, kind)
             except Exception:
                 result[kind] = None
-
-        # Fallback: if the scope did not return a level stat, compute it from the
-        # waveform (keeps this working on other family models that may lack one).
-        missing = [k for k in ("vmax", "vmin", "vpp", "vmean", "vrms")
-                   if result.get(k) is None]
-        if missing:
-            v = self.capture(channel)["volts"]
-            local = {
-                "vmax": float(v.max()),
-                "vmin": float(v.min()),
-                "vpp": float(v.max() - v.min()),
-                "vmean": float(v.mean()),
-                "vrms": float(np.sqrt(np.mean(v * v))),
-            }
-            for k in missing:
-                result[k] = local[k]
         return result
 
     # ------------------------------------------------------------- waveforms
