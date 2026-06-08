@@ -155,6 +155,28 @@ each one, is in [SCPI_COMMANDS.md](SCPI_COMMANDS.md).
 
 ---
 
+## Related models (likely compatible, not tested)
+
+This driver was only tested on a Hanmatek DOS1104. That scope is a rebadge of the
+Owon SDS1104, and the Owon SDS1000 family shares the same SCPI dialect (the
+`:DATA:WAVE:*` and `:MEAS:CH<n>:*` commands), so these are likely to work too.
+None of them were tested here - if you try one, please open an issue and say how
+it went.
+
+| Brand | Model | Notes |
+|---|---|---|
+| Hanmatek | DOS1104 | The one this driver was tested on (4-channel, 100 MHz). |
+| Hanmatek | DOS1102 / DOS1102S | 2-channel, 100 MHz; rebadge of the Owon SDS1102. |
+| Owon | SDS1104 | Same scope as the DOS1104. |
+| Owon | SDS1102 | 2-channel version. |
+| Owon | SDS1022 / SDS1052 / SDS1202 | SDS1000 "economical" 2-channel line; same SCPI family, different bandwidth and ranges. |
+
+On a 2-channel model only CH1 and CH2 exist. The commands should be the same, but
+check the volts conversion on your unit: capture a known voltage and confirm that
+6400 codes still equals one division (`CODES_PER_DIV` in `dos1104.py`).
+
+---
+
 ## License
 
 MIT - see [LICENSE](LICENSE). Do whatever you like with it.
